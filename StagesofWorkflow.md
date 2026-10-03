@@ -37,6 +37,11 @@ Packages
  ↓
 Delivery missions
 
+The Stage 5 warehouse catalog is now available at
+`warehouse_robot_navigation/config/warehouse.yaml`. It defines the robot
+base, package pickup locations, and delivery stations in the map frame. The
+task manager and mission state machine remain Stage 6 work.
+
 Stage 6:
 Task Manager
  ↓
