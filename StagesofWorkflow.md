@@ -49,6 +49,13 @@ Mission Planner
  ↓
 Nav2
 
+Stage 6 is implemented by `warehouse_robot_interfaces` and
+`warehouse_robot_tasks`. Start the complete delivery stack with
+`ros2 launch warehouse_robot_tasks mission.launch.py`, then request a
+delivery through the `/request_delivery` service. The mission planner
+navigates to the package, simulates pickup, navigates to its station, simulates
+delivery, and returns to the base.
+
 Stage 7:
 
 Dynamic obstacles

@@ -1,0 +1,4 @@
+string package_id
+---
+bool accepted
+string message
