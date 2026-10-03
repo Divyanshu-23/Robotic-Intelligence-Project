@@ -1,0 +1,23 @@
+# Warehouse locations used by delivery missions.
+# Coordinates are expressed in the map/world frame in metres.
+base:
+  location: [-6.5, -5.5]
+
+packages:
+  A12:
+    location: [-6.0, 5.0]
+    destination: station_1
+  B21:
+    location: [6.0, 2.0]
+    destination: station_2
+  C07:
+    location: [6.0, -2.0]
+    destination: station_3
+
+stations:
+  station_1:
+    location: [6.0, 4.5]
+  station_2:
+    location: [6.0, 0.0]
+  station_3:
+    location: [6.0, -4.5]
