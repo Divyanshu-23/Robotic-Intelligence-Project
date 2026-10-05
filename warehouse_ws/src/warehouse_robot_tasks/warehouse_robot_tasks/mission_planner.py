@@ -99,7 +99,42 @@ class MissionPlanner(Node):
                 raise RuntimeError(
                     f'Warehouse catalog is missing mapping: {section}'
                 )
+        MissionPlanner._validate_location(
+            warehouse['base'].get('location'), 'base'
+        )
+        for package_id, package in warehouse['packages'].items():
+            if not isinstance(package, dict):
+                raise RuntimeError(
+                    f'Package {package_id} must contain a mapping'
+                )
+            MissionPlanner._validate_location(
+                package.get('location'), f'package {package_id}'
+            )
+            if not isinstance(package.get('destination'), str):
+                raise RuntimeError(
+                    f'Package {package_id} must define a destination'
+                )
+        for station_id, station in warehouse['stations'].items():
+            if not isinstance(station, dict):
+                raise RuntimeError(
+                    f'Station {station_id} must contain a mapping'
+                )
+            MissionPlanner._validate_location(
+                station.get('location'), f'station {station_id}'
+            )
         return warehouse
+
+    @staticmethod
+    def _validate_location(location, name):
+        if not isinstance(location, (list, tuple)) or len(location) != 2:
+            raise RuntimeError(f'{name} location must be [x, y]')
+        try:
+            float(location[0])
+            float(location[1])
+        except (TypeError, ValueError) as error:
+            raise RuntimeError(
+                f'{name} location must contain numeric coordinates'
+            ) from error
 
     def _request_delivery(self, request, response):
         package_id = request.package_id.strip()
@@ -236,14 +271,29 @@ class MissionPlanner(Node):
     def _start_timed_state(self, state, duration, callback):
         if self._timer is not None:
             self._timer.cancel()
+        self._set_state(state)
+
+        def complete_timed_state():
+            self._timer.cancel()
+            self._timer = None
+            callback()
+
         self._timer = self.create_timer(
-            max(0.0, duration), callback, callback_group=self._callback_group
+            max(0.001, duration),
+            complete_timed_state,
+            callback_group=self._callback_group,
         )
 
     def _finish_mission(self):
         if self._timer is not None:
             self._timer.cancel()
             self._timer = None
+        if self._navigation_wait_timer is not None:
+            self._navigation_wait_timer.cancel()
+            self._navigation_wait_timer = None
+        if self._navigation_goal is not None:
+            self._navigation_goal.cancel_goal_async()
+            self._navigation_goal = None
         self._package_id = None
         self._package = None
         self._destination = None
